@@ -1,1 +1,2 @@
-"# personal-finance-tracker-api" 
+# Personal Finance Tracker Api
+Currently developing a Personal Finance Tracker application using Django and Django Rest Framework for the backend API, coupled with Angular for the frontend interface. This project allows users to register an account, enabling them to efficiently manage their finances by tracking expenses, setting budgets, generating insightful reports and secure data handling to ensure a seamless and reliable financial management experience.
