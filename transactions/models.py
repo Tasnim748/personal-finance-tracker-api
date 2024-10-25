@@ -1,62 +1,41 @@
 from django.db import models
-from accountManagement.models import User
+
+from accounts.models import Account
 
 # Create your models here.
-class ExpenseType(models.Model):
-    name = models.CharField(max_length=20, unique=True)
+class Category(models.Model):
+    name = models.CharField(max_length=100)
+    type = models.CharField(
+        max_length=50,
+        choices=[
+            ('expense', 'Expense'),
+            ('income', 'Income'),
+        ]
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self) -> str:
-        return self.name
+    def __str__(self):
+        return f"{self.name} ({self.type})"
+
+    class Meta:
+        verbose_name_plural = "Categories"
+
+
+class Transaction(models.Model):
+    account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='transactions')
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, related_name='transactions')
+    amount = models.DecimalField(max_digits=12, decimal_places=2)
+    description = models.TextField(blank=True)
+    date = models.DateField()
+    is_recurring = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.category.type} - {self.amount} - {self.date}"
     
-
-class Expense(models.Model):
-    name = models.CharField(max_length=50)
-    dueDate = models.DateField()
-    amount = models.DecimalField(decimal_places=2, max_digits=15, null=True)
-    typeRef = models.ForeignKey(ExpenseType, on_delete=models.SET_NULL, related_name='expenses', null=True)
-    personRef = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='expenses')
-    paid = models.DecimalField(decimal_places=2, max_digits=15, null=True)
-
-    def __str__(self) -> str:
-        return self.name
-
     @property
-    def due(self):
-        if self.amount and self.paid:
-            return self.amount - self.paid
-        return
-    
-    @property
-    def type(self):
-        return self.typeRef.name
-    
-    @property
-    def person(self):
-        return str(self.personRef)
-    
-
-class SuddenExpense(models.Model):
-    name = models.CharField(max_length=50)
-    date = models.DateField(auto_now_add=True)
-    amount = models.DecimalField(decimal_places=2, max_digits=10, null=True)
-    personRef = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='suddenExpenses')
-
-    @property
-    def person(self):
-        return str(self.personRef)
-
-
-class Loan(models.Model):
-    amount = models.DecimalField(decimal_places=2, max_digits=15)
-    dueDate = models.DateField()
-    paid = models.DecimalField(decimal_places=2, max_digits=15)
-    personRef = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='loans')
-    description = models.CharField(max_length=50, unique=True)
-
-    @property
-    def due(self):
-        return self.amount - self.paid
-
-    @property
-    def person(self):
-        return str(self.personRef)
+    def transaction_type(self):
+        """
+        Returns the transaction type based on the category
+        """
+        return self.category.type if self.category else None
