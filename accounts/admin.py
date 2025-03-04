@@ -11,4 +11,7 @@ class CustomUserAdmin(UserAdmin):
 
 
 admin.site.register(models.User, CustomUserAdmin)
-admin.site.register(models.Account)
+
+@admin.register(models.Account)
+class AccountAdmin(admin.ModelAdmin):
+    list_display = ('name', 'user', 'balance', 'account_type')

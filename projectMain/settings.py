@@ -85,7 +85,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'finance_tracker',
         'USER': 'postgres',
-        'PASSWORD': '1234_psql',
+        'PASSWORD': '4321_psql',
         'HOST': 'localhost',
         'PORT': '5432',
     }
